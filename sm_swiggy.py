@@ -23,6 +23,17 @@ from telegram.ext import (
     ConversationHandler, filters, ContextTypes,
 )
 
+# Proxy configuration
+PROXY_HOST = "rotating-dc.proxy.arealproxy.com:9000"
+PROXY_USER = "3b406cf348410d0fba-country-in"
+PROXY_PASS = "65d37bef-ec91-40a3-a371-a9cca15c5b18"
+PROXY_URL = f"http://{PROXY_USER}:{PROXY_PASS}@{PROXY_HOST}"
+
+PROXIES = {
+    "http": PROXY_URL,
+    "https": PROXY_URL,
+}
+
 BOT_TOKEN = "8257175809:AAEShGpg_tnhrW0V4Fj_dQomuH1AsKVazgk"
 BASE_URL   = "https://api.thegoodtimesleague.com/api/game"
 LB_URL     = "https://api.thegoodtimesleague.com/game/leaderboard"
@@ -80,11 +91,13 @@ HEADERS = {
 def api_login(mobile):
     s = requests.Session()
     s.headers.update(HEADERS)
+    s.proxies.update(PROXIES)
+    # Bandwidth optimization: shorter timeout, stream=False
     r = s.post(f"{BASE_URL}/login", json={
         "mobile": mobile,
         "utm_source": "Direct", "utm_medium": "Direct",
         "utm_campaign": "Direct", "browser": "Chrome", "os": "Android",
-    })
+    }, timeout=10)
     r.raise_for_status()
     return r.json(), s
 
@@ -104,27 +117,27 @@ def api_signup(session, mobile, name, age, state):
         "utm_campaign": "Direct",
         "browser": "Chrome",
         "os": "Android",
-    })
+    }, timeout=10)
     r.raise_for_status()
     return r.json()
 
 
 def api_verify_otp(session, otp_token, otp):
     session.headers["Authorization"] = f"Bearer {otp_token}"
-    r = session.post(f"{BASE_URL}/otp/verify", json={"otp": otp})
+    r = session.post(f"{BASE_URL}/otp/verify", json={"otp": otp}, timeout=10)
     r.raise_for_status()
     return r.json()
 
 
 def api_ping(session):
     """Validate token + get profile: name, total_score, total_plays, gen_ai_limit_reached"""
-    r = session.post(f"{BASE_URL}/ping")
+    r = session.post(f"{BASE_URL}/ping", timeout=10)
     r.raise_for_status()
     return r.json()
 
 
 def api_game_data(session, lat, lng):
-    r = session.post(f"{BASE_URL}/data", json={"lat": lat, "lng": lng})
+    r = session.post(f"{BASE_URL}/data", json={"lat": lat, "lng": lng}, timeout=10)
     r.raise_for_status()
     return r.json()
 
@@ -167,7 +180,7 @@ def api_submit_score(session, scores, store_id=None):
     payload = {"scores": scores}
     if store_id:  # only add if truthy — matches JS: window.storeId ? {store_id} : {}
         payload["store_id"] = store_id
-    r = session.post(f"{BASE_URL}/score", json=payload)
+    r = session.post(f"{BASE_URL}/score", json=payload, timeout=10)
     return r
 
 
@@ -176,7 +189,7 @@ def api_leaderboard(session, data_type="match_tickets"):
     data_type: "match_tickets" or "weekly"
     NOTE: different URL — /game/leaderboard (no /api/ prefix)
     """
-    r = session.post(LB_URL, json={"data_type": data_type})
+    r = session.post(LB_URL, json={"data_type": data_type}, timeout=10)
     r.raise_for_status()
     return r.json()
 
