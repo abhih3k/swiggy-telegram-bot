@@ -42,7 +42,7 @@ LB_URL     = "https://api.thegoodtimesleague.com/game/leaderboard"
 REQUIRED_CHANNEL = "@kalajadu69"  # Channel username
 CHANNEL_LINK = "https://t.me/kalajadu69"  # Channel link
 
-# Default GPS — your location
+# Default GPS — your location``
 DEFAULT_LAT = 28.6139
 DEFAULT_LNG = 77.2090
 
@@ -248,16 +248,29 @@ def build_scores(mode="max"):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "👋 *Good Times League Bot*\n\n"
-        "🎁 Swiggy Voucher ₹50 — daily 50 pts\n"
-        "🎁 Myntra Voucher ₹1500 — weekly 400 pts\n\n"
-        "⚠️ *IMPORTANT*: You must join our channel to use this bot!\n"
-        f"📢 Channel: {CHANNEL_LINK}\n\n"
-        "Commands:\n"
-        "/play — Play today's game\n"
-        "/status — Check score & profile\n"
-        "/leaderboard — Top players\n"
-        "/cancel — Cancel current action",
+        "╔═══════════════════════╗\n"
+        "║  🎮 *Good Times League* 🎮  ║\n"
+        "╚═══════════════════════╝\n\n"
+        "🎁 *Daily Rewards*\n"
+        "   ├ Swiggy Voucher ₹50 (50 pts)\n"
+        "   └ Play daily & win!\n\n"
+        "🏆 *Weekly Rewards*\n"
+        "   ├ Myntra Voucher ₹1500 (400 pts)\n"
+        "   └ Top players get prizes!\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n"
+        "⚠️ *IMPORTANT NOTICE*\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n"
+        "📢 Join our channel to unlock bot:\n"
+        f"🔗 {CHANNEL_LINK}\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n"
+        "📋 *Available Commands*\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n"
+        "🎯 /play — Start today's game\n"
+        "📊 /status — View your profile\n"
+        "🏆 /leaderboard — See top players\n"
+        "❌ /cancel — Cancel operation\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n"
+        "✨ *Made with ❤️ by Mihawk Team*",
         parse_mode="Markdown"
     )
 
@@ -267,10 +280,18 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     is_member = await check_channel_membership(update, context)
     if not is_member:
         await update.message.reply_text(
-            "⚠️ *Channel Subscription Required!*\n\n"
-            "You must join our channel to use this bot.\n\n"
-            f"📢 Join here: {CHANNEL_LINK}\n\n"
-            "After joining, send /play again.",
+            "╔═══════════════════════╗\n"
+            "║  🚫 *ACCESS DENIED* 🚫  ║\n"
+            "╚═══════════════════════╝\n\n"
+            "⚠️ *Channel Subscription Required*\n\n"
+            "🔒 This bot is exclusive for our channel members!\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            "📢 *Join Our Channel*\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            f"🔗 {CHANNEL_LINK}\n\n"
+            "✅ After joining, send /play again\n"
+            "💡 It takes only 5 seconds!\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━",
             parse_mode="Markdown"
         )
         return ConversationHandler.END
@@ -279,7 +300,15 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mode = args[0] if args and args[0] in ("50", "90", "150") else "90"
     context.user_data["score_mode"] = mode
     await update.message.reply_text(
-        f"📱 Enter your *10-digit mobile number*:\n_(Score mode: `{mode}` pts)_",
+        "╔═══════════════════════╗\n"
+        "║  🎮 *START PLAYING* 🎮  ║\n"
+        "╚═══════════════════════╝\n\n"
+        f"🎯 *Score Mode*: `{mode}` points\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n"
+        "📱 *Enter Your Mobile Number*\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n"
+        "📞 Please enter your 10-digit mobile number:\n\n"
+        "💡 Format: 9876543210",
         parse_mode="Markdown"
     )
     return MOBILE
@@ -288,9 +317,19 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_mobile(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mobile = update.message.text.strip()
     if not mobile.isdigit() or len(mobile) != 10:
-        await update.message.reply_text("❌ Invalid. Enter 10-digit mobile:")
+        await update.message.reply_text(
+            "❌ *Invalid Mobile Number*\n\n"
+            "Please enter a valid 10-digit number\n"
+            "Example: 9876543210",
+            parse_mode="Markdown"
+        )
         return MOBILE
-    await update.message.reply_text(f"⏳ Checking account for `{mobile}`...", parse_mode="Markdown")
+    await update.message.reply_text(
+        f"🔍 *Verifying Account*\n\n"
+        f"📱 Mobile: `{mobile}`\n"
+        f"⏳ Please wait...",
+        parse_mode="Markdown"
+    )
     try:
         data, sess = api_login(mobile)
         user_type = data.get("userType", "existing")
@@ -304,26 +343,44 @@ async def get_mobile(update: Update, context: ContextTypes.DEFAULT_TYPE):
             state = random.choice(INDIA_STATES)
 
             await update.message.reply_text(
-                f"🆕 *New account detected!*\n\n"
-                f"Auto-registering with random details:\n"
+                "╔═══════════════════════╗\n"
+                "║  🆕 *NEW ACCOUNT* 🆕  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "✨ *Auto-Registering Your Account*\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "📋 *Account Details*\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
                 f"👤 Name: `{name}`\n"
-                f"🎂 Age: `{age}`\n"
+                f"🎂 Age: `{age}` years\n"
                 f"📍 State: `{state}`\n\n"
-                f"⏳ Creating account...",
+                "⏳ Creating your account...\n"
+                "⚡ This will take just a moment!",
                 parse_mode="Markdown"
             )
 
             signup_data = api_signup(sess, mobile, name, age, state)
             otp_token = signup_data.get("token")
             if not otp_token:
-                await update.message.reply_text(f"❌ Signup failed: `{signup_data}`", parse_mode="Markdown")
+                await update.message.reply_text(
+                    f"❌ *Signup Failed*\n\n"
+                    f"Error: `{signup_data}`\n\n"
+                    f"Please try again with /play",
+                    parse_mode="Markdown"
+                )
                 return ConversationHandler.END
 
             context.user_data["otp_token"] = otp_token
             await update.message.reply_text(
-                f"✅ *Account created automatically!*\n"
-                f"OTP has been sent to *{mobile}*\n\n"
-                f"👉 Enter OTP now:",
+                "╔═══════════════════════╗\n"
+                "║  ✅ *ACCOUNT CREATED* ✅  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "🎉 Your account has been created successfully!\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "📲 *OTP Verification*\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                f"📱 SMS sent to: *{mobile}*\n"
+                f"🔢 Please enter the OTP code:\n\n"
+                f"💡 Check your messages for the code",
                 parse_mode="Markdown"
             )
             return OTP
@@ -332,14 +389,26 @@ async def get_mobile(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Existing user — OTP already sent by login call
             context.user_data["otp_token"] = otp_token
             await update.message.reply_text(
-                f"✅ OTP sent to *{mobile}*\n"
-                f"👤 Account: `existing`\n\n"
-                f"Enter OTP:",
+                "╔═══════════════════════╗\n"
+                "║  👤 *EXISTING USER* 👤  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "✅ Account found in our system!\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "📲 *OTP Verification*\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                f"📱 SMS sent to: *{mobile}*\n"
+                f"🔢 Please enter the OTP code:\n\n"
+                f"💡 Check your messages for the code",
                 parse_mode="Markdown"
             )
             return OTP
     except Exception as e:
-        await update.message.reply_text(f"❌ {e}")
+        await update.message.reply_text(
+            f"❌ *Error Occurred*\n\n"
+            f"Error: `{e}`\n\n"
+            f"Please try again with /play",
+            parse_mode="Markdown"
+        )
         return ConversationHandler.END
 
 
@@ -360,11 +429,20 @@ async def get_otp(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sess      = context.user_data["session"]
     otp_token = context.user_data["otp_token"]
 
-    await update.message.reply_text("⏳ Verifying OTP...")
+    await update.message.reply_text(
+        "🔐 *Verifying OTP*\n\n"
+        "⏳ Please wait...",
+        parse_mode="Markdown"
+    )
     try:
         data = api_verify_otp(sess, otp_token, otp)
         if data.get("status") != "verified":
-            await update.message.reply_text("❌ Wrong/expired OTP. Try /play again.")
+            await update.message.reply_text(
+                "❌ *Verification Failed*\n\n"
+                "⚠️ Wrong or expired OTP code\n\n"
+                "Please try again with /play",
+                parse_mode="Markdown"
+            )
             return ConversationHandler.END
 
         access_token = data["token"]
@@ -373,15 +451,27 @@ async def get_otp(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         user = data.get("user", {})
         await update.message.reply_text(
-            f"✅ *Logged in!*\n\n"
-            f"👤 {user.get('name')} | 📍 {user.get('state')}\n"
-            f"🏆 Total: `{user.get('total_score')}` pts | 🎮 Plays: `{user.get('total_plays')}`\n\n"
-            f"⏳ Fetching game data...",
+            "╔═══════════════════════╗\n"
+            "║  ✅ *LOGIN SUCCESS* ✅  ║\n"
+            "╚═══════════════════════╝\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            "👤 *Your Profile*\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📛 Name: *{user.get('name')}*\n"
+            f"📍 State: `{user.get('state')}`\n"
+            f"🏆 Total Score: `{user.get('total_score')}` pts\n"
+            f"🎮 Games Played: `{user.get('total_plays')}`\n\n"
+            f"⏳ Fetching today's game data...",
             parse_mode="Markdown"
         )
 
         # Fetch game data with store GPS spoof
-        await update.message.reply_text("🔍 Checking store proximity...")
+        await update.message.reply_text(
+            "🗺️ *Checking Store Location*\n\n"
+            "📍 Using GPS to find nearby stores...\n"
+            "⏳ Please wait...",
+            parse_mode="Markdown"
+        )
         gdata, store_id = api_game_data_with_store_spoof(sess, DEFAULT_LAT, DEFAULT_LNG)
 
         store      = gdata.get("store")
@@ -391,20 +481,54 @@ async def get_otp(update: Update, context: ContextTypes.DEFAULT_TYPE):
         objects    = gdata.get("objects", [])
 
         store_name = store.get("store_name") if store else "None (out of store)"
+        
+        status_icon = "✅" if is_in_store else "❌"
+        played_icon = "✅" if already else "❌"
+        
         await update.message.reply_text(
-            f"📊 *Game Status*\n\n"
-            f"Today: `{today_sc}` pts | Already played: `{already}`\n"
-            f"🏪 Store: `{store_name}`\n"
-            f"📍 In Store: `{is_in_store}` | Store ID: `{store_id}`",
+            "╔═══════════════════════╗\n"
+            "║  📊 *GAME STATUS* 📊  ║\n"
+            "╚═══════════════════════╝\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            "📈 *Today's Progress*\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            f"🎯 Score Today: `{today_sc}` pts\n"
+            f"{played_icon} Already Played: `{already}`\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            "🏪 *Store Information*\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            f"🏬 Store: `{store_name}`\n"
+            f"{status_icon} In Store Range: `{is_in_store}`\n"
+            f"🆔 Store ID: `{store_id if store_id else 'N/A'}`",
             parse_mode="Markdown"
         )
 
         if already:
-            await update.message.reply_text("⚠️ Already played today! Come back tomorrow.")
+            await update.message.reply_text(
+                "╔═══════════════════════╗\n"
+                "║  ⚠️ *ALREADY PLAYED* ⚠️  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "✅ You've already played today!\n\n"
+                "🕐 Come back tomorrow for new rewards\n"
+                "⏰ Game resets at midnight\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "💡 Use /status to check your profile!",
+                parse_mode="Markdown"
+            )
             return ConversationHandler.END
 
         if today_sc >= 150:
-            await update.message.reply_text("⚠️ Daily cap (150 pts) reached! Come back tomorrow.")
+            await update.message.reply_text(
+                "╔═══════════════════════╗\n"
+                "║  🎯 *DAILY CAP REACHED* 🎯  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "🏆 You've reached the daily limit!\n\n"
+                "📊 Daily Cap: 150 points\n"
+                f"✅ Your Score: {today_sc} points\n\n"
+                "🕐 Come back tomorrow for more!\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━",
+                parse_mode="Markdown"
+            )
             return ConversationHandler.END
 
         if not is_in_store:
@@ -412,11 +536,18 @@ async def get_otp(update: Update, context: ContextTypes.DEFAULT_TYPE):
             nearest_txt = ""
             for ns in nearest[:3]:
                 dist_km = round(ns.get("distance_m", 0) / 1000, 2)
-                nearest_txt += f"  • {ns['store_name']} ({dist_km} km)\n"
+                nearest_txt += f"  📍 {ns['store_name']} ({dist_km} km)\n"
             await update.message.reply_text(
-                f"⚠️ *Not near a participating store*\n\n"
-                f"Nearest stores:\n{nearest_txt}\n"
-                f"GPS spoof also failed. Cannot submit score.",
+                "╔═══════════════════════╗\n"
+                "║  ⚠️ *OUT OF RANGE* ⚠️  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "❌ You're not near a participating store\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "🗺️ *Nearest Stores*\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                f"{nearest_txt}\n"
+                "💡 GPS spoofing also failed\n"
+                "⚠️ Cannot submit score at this time",
                 parse_mode="Markdown"
             )
             return ConversationHandler.END
@@ -425,8 +556,12 @@ async def get_otp(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mode = context.user_data.get("score_mode", "90")
         scores = build_scores(mode)
         await update.message.reply_text(
-            f"🎮 *Submitting score...*\n"
-            f"Payload: `{json.dumps({'scores': scores, 'store_id': store_id} if store_id else {'scores': scores})}`",
+            "╔═══════════════════════╗\n"
+            "║  🎮 *SUBMITTING SCORE* 🎮  ║\n"
+            "╚═══════════════════════╝\n\n"
+            f"🎯 Mode: `{mode}` points\n"
+            f"📦 Payload: `{json.dumps({'scores': scores, 'store_id': store_id} if store_id else {'scores': scores})}`\n\n"
+            f"⏳ Please wait...",
             parse_mode="Markdown"
         )
 
@@ -437,24 +572,48 @@ async def get_otp(update: Update, context: ContextTypes.DEFAULT_TYPE):
             new_total = result.get("total_score", "?")
             session_pts = sum(s['score'] for s in scores)
             await update.message.reply_text(
-                f"🎉 *Score Submitted!*\n\n"
-                f"Mode: `{mode}` pts\n"
-                f"Session score: `{session_pts}` pts\n"
-                f"New total: `{new_total}` pts\n\n"
-                f"✅ Check SMS for Swiggy Voucher!",
+                "╔═══════════════════════╗\n"
+                "║  🎉 *SUCCESS!* 🎉  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "✅ Score submitted successfully!\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "📊 *Your Results*\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                f"🎯 Mode: `{mode}` points\n"
+                f"⚡ Session Score: `{session_pts}` pts\n"
+                f"🏆 New Total: `{new_total}` pts\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "🎁 *Reward Status*\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "📱 Check your SMS for Swiggy Voucher!\n"
+                "✨ Keep playing daily for more rewards\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "💡 Use /status to view your profile!",
                 parse_mode="Markdown"
             )
         else:
             await update.message.reply_text(
-                f"❌ *Score submission failed*\n\n"
-                f"Status: `{r.status_code}`\n"
-                f"Body: `{r.text[:300]}`\n\n"
-                f"Raw payload: `{json.dumps({'scores': scores, 'store_id': store_id} if store_id else {'scores': scores})}`",
+                "╔═══════════════════════╗\n"
+                "║  ❌ *SUBMISSION FAILED* ❌  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "⚠️ Could not submit your score\n\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                "🔍 *Error Details*\n"
+                "━━━━━━━━━━━━━━━━━━━━━\n"
+                f"📊 Status Code: `{r.status_code}`\n"
+                f"📄 Response: `{r.text[:300]}`\n\n"
+                f"📦 Payload: `{json.dumps({'scores': scores, 'store_id': store_id} if store_id else {'scores': scores})}`\n\n"
+                "💡 Please try again with /play",
                 parse_mode="Markdown"
             )
 
     except Exception as e:
-        await update.message.reply_text(f"❌ {e}\n\nTry /play again.")
+        await update.message.reply_text(
+            f"❌ *Error Occurred*\n\n"
+            f"Error: `{e}`\n\n"
+            f"Please try again with /play",
+            parse_mode="Markdown"
+        )
 
     return ConversationHandler.END
 
@@ -464,8 +623,10 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     is_member = await check_channel_membership(update, context)
     if not is_member:
         await update.message.reply_text(
-            "⚠️ *Channel Subscription Required!*\n\n"
-            "You must join our channel to use this bot.\n\n"
+            "╔═══════════════════════╗\n"
+            "║  🚫 *ACCESS DENIED* 🚫  ║\n"
+            "╚═══════════════════════╝\n\n"
+            "⚠️ *Channel Subscription Required*\n\n"
             f"📢 Join here: {CHANNEL_LINK}\n\n"
             "After joining, try again.",
             parse_mode="Markdown"
@@ -474,25 +635,47 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sess = context.user_data.get("session")
     if not sess:
-        await update.message.reply_text("⚠️ Not logged in. Use /play first.")
+        await update.message.reply_text(
+            "⚠️ *Not Logged In*\n\n"
+            "Please use /play first to login!",
+            parse_mode="Markdown"
+        )
         return
     try:
         # Use ping for profile data (more fields than game/data)
         ping = api_ping(sess)
         gdata = api_game_data(sess, DEFAULT_LAT, DEFAULT_LNG)
+        
+        played_icon = "✅" if gdata.get('isAlreadyPlayed', False) else "❌"
+        ai_icon = "✅" if ping.get('gen_ai_limit_reached', False) else "❌"
 
         await update.message.reply_text(
-            f"📊 *Profile*\n\n"
-            f"👤 {ping.get('name', '?')}\n"
-            f"🏆 Total score: `{ping.get('total_score', 0)}`\n"
-            f"🎮 Total plays: `{ping.get('total_plays', 0)}`\n"
-            f"📅 Today: `{gdata.get('todays_score', 0)}` pts\n"
-            f"✅ Played today: `{gdata.get('isAlreadyPlayed', False)}`\n"
-            f"🎨 AI image used: `{ping.get('gen_ai_limit_reached', False)}`",
+            "╔═══════════════════════╗\n"
+            "║  📊 *YOUR PROFILE* 📊  ║\n"
+            "╚═══════════════════════╝\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            "👤 *Personal Info*\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📛 Name: *{ping.get('name', '?')}*\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            "📈 *Statistics*\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            f"🏆 Total Score: `{ping.get('total_score', 0)}` pts\n"
+            f"🎮 Total Plays: `{ping.get('total_plays', 0)}` games\n"
+            f"📅 Today's Score: `{gdata.get('todays_score', 0)}` pts\n"
+            f"{played_icon} Played Today: `{gdata.get('isAlreadyPlayed', False)}`\n"
+            f"{ai_icon} AI Image Used: `{ping.get('gen_ai_limit_reached', False)}`\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+            "💡 Use /play to earn more points!",
             parse_mode="Markdown"
         )
     except Exception as e:
-        await update.message.reply_text(f"❌ {e}")
+        await update.message.reply_text(
+            f"❌ *Error Occurred*\n\n"
+            f"Error: `{e}`\n\n"
+            f"Please try /play again",
+            parse_mode="Markdown"
+        )
 
 
 async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -500,8 +683,10 @@ async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     is_member = await check_channel_membership(update, context)
     if not is_member:
         await update.message.reply_text(
-            "⚠️ *Channel Subscription Required!*\n\n"
-            "You must join our channel to use this bot.\n\n"
+            "╔═══════════════════════╗\n"
+            "║  🚫 *ACCESS DENIED* 🚫  ║\n"
+            "╚═══════════════════════╝\n\n"
+            "⚠️ *Channel Subscription Required*\n\n"
             f"📢 Join here: {CHANNEL_LINK}\n\n"
             "After joining, try again.",
             parse_mode="Markdown"
@@ -510,10 +695,18 @@ async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sess = context.user_data.get("session")
     if not sess:
-        await update.message.reply_text("⚠️ Not logged in. Use /play first.")
+        await update.message.reply_text(
+            "⚠️ *Not Logged In*\n\n"
+            "Please use /play first to login!",
+            parse_mode="Markdown"
+        )
         return
     try:
-        await update.message.reply_text("⏳ Fetching leaderboard...")
+        await update.message.reply_text(
+            "🔄 *Fetching Leaderboard*\n\n"
+            "⏳ Please wait...",
+            parse_mode="Markdown"
+        )
         data = api_leaderboard(sess, "match_tickets")
         entries = data if isinstance(data, list) else (
             data.get("leaderboard") or data.get("entries") or data.get("data") or []
@@ -523,23 +716,57 @@ async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ) if not isinstance(data, list) else len(entries)
 
         if not entries:
-            await update.message.reply_text("📋 No leaderboard entries yet.")
+            await update.message.reply_text(
+                "╔═══════════════════════╗\n"
+                "║  📋 *LEADERBOARD* 📋  ║\n"
+                "╚═══════════════════════╝\n\n"
+                "⚠️ No entries yet\n\n"
+                "Be the first to play and claim the top spot!",
+                parse_mode="Markdown"
+            )
             return
 
-        lines = [f"🏆 *Leaderboard* (Total winners: {total_winners})\n"]
+        # Create medals for top 3
+        medals = {1: "🥇", 2: "🥈", 3: "🥉"}
+        
+        lines = [
+            "╔═══════════════════════╗\n"
+            "║  🏆 *TOP PLAYERS* 🏆  ║\n"
+            "╚═══════════════════════╝\n\n"
+            f"👥 Total Winners: *{total_winners}*\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━\n"
+        ]
+        
         for i, entry in enumerate(entries[:10], 1):
             name  = entry.get("name") or entry.get("username") or "?"
             score = entry.get("total_score") or entry.get("score") or "?"
             state = entry.get("state") or entry.get("user_state") or "?"
-            lines.append(f"`{i:2}.` {name} | {state} | *{score} pts*")
+            
+            medal = medals.get(i, f"`{i:2}.`")
+            lines.append(f"{medal} *{name}* | {state}\n    💎 {score} pts\n")
 
-        await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+        lines.append("\n━━━━━━━━━━━━━━━━━━━━━\n")
+        lines.append("💡 Keep playing to climb the ranks!")
+
+        await update.message.reply_text("".join(lines), parse_mode="Markdown")
     except Exception as e:
-        await update.message.reply_text(f"❌ {e}")
+        await update.message.reply_text(
+            f"❌ *Error Occurred*\n\n"
+            f"Error: `{e}`\n\n"
+            f"Please try again",
+            parse_mode="Markdown"
+        )
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("❌ Cancelled. Use /play to start.")
+    await update.message.reply_text(
+        "╔═══════════════════════╗\n"
+        "║  ❌ *CANCELLED* ❌  ║\n"
+        "╚═══════════════════════╝\n\n"
+        "Operation cancelled successfully\n\n"
+        "💡 Use /play to start playing again!",
+        parse_mode="Markdown"
+    )
     return ConversationHandler.END
 
 
