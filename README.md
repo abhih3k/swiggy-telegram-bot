@@ -29,8 +29,8 @@ A Telegram bot for automating The Good Times League game with automatic random s
 
 1. Clone the repository:
 ```bash
-git clone <your-repo-url>
-cd swiggy
+git clone https://github.com/abhih3k/swiggy-telegram-bot.git
+cd swiggy-telegram-bot
 ```
 
 2. Install dependencies:
