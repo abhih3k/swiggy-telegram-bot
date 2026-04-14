@@ -38,6 +38,10 @@ BOT_TOKEN = "8257175809:AAEShGpg_tnhrW0V4Fj_dQomuH1AsKVazgk"
 BASE_URL   = "https://api.thegoodtimesleague.com/api/game"
 LB_URL     = "https://api.thegoodtimesleague.com/game/leaderboard"
 
+# Forced channel subscription
+REQUIRED_CHANNEL = "@kalajadu69"  # Channel username
+CHANNEL_LINK = "https://t.me/kalajadu69"  # Channel link
+
 # Default GPS — your location
 DEFAULT_LAT = 28.6139
 DEFAULT_LNG = 77.2090
@@ -84,6 +88,22 @@ HEADERS = {
     "sec-ch-ua-mobile": "?1",
     "sec-ch-ua-platform": '"Android"',
 }
+
+
+# ── Channel membership check ─────────────────────────────────────────
+async def check_channel_membership(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Check if user is a member of required channel. Returns True if member, False otherwise."""
+    user_id = update.effective_user.id
+    try:
+        member = await context.bot.get_chat_member(chat_id=REQUIRED_CHANNEL, user_id=user_id)
+        # member.status can be: 'creator', 'administrator', 'member', 'restricted', 'left', 'kicked'
+        if member.status in ['creator', 'administrator', 'member']:
+            return True
+        else:
+            return False
+    except Exception as e:
+        logging.error(f"Error checking channel membership: {e}")
+        return False
 
 
 # ── API helpers ──────────────────────────────────────────────────────
@@ -231,6 +251,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👋 *Good Times League Bot*\n\n"
         "🎁 Swiggy Voucher ₹50 — daily 50 pts\n"
         "🎁 Myntra Voucher ₹1500 — weekly 400 pts\n\n"
+        "⚠️ *IMPORTANT*: You must join our channel to use this bot!\n"
+        f"📢 Channel: {CHANNEL_LINK}\n\n"
         "Commands:\n"
         "/play — Play today's game\n"
         "/status — Check score & profile\n"
@@ -241,6 +263,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Check channel membership first
+    is_member = await check_channel_membership(update, context)
+    if not is_member:
+        await update.message.reply_text(
+            "⚠️ *Channel Subscription Required!*\n\n"
+            "You must join our channel to use this bot.\n\n"
+            f"📢 Join here: {CHANNEL_LINK}\n\n"
+            "After joining, send /play again.",
+            parse_mode="Markdown"
+        )
+        return ConversationHandler.END
+    
     args = context.args
     mode = args[0] if args and args[0] in ("50", "90", "150") else "90"
     context.user_data["score_mode"] = mode
@@ -426,6 +460,18 @@ async def get_otp(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Check channel membership first
+    is_member = await check_channel_membership(update, context)
+    if not is_member:
+        await update.message.reply_text(
+            "⚠️ *Channel Subscription Required!*\n\n"
+            "You must join our channel to use this bot.\n\n"
+            f"📢 Join here: {CHANNEL_LINK}\n\n"
+            "After joining, try again.",
+            parse_mode="Markdown"
+        )
+        return
+    
     sess = context.user_data.get("session")
     if not sess:
         await update.message.reply_text("⚠️ Not logged in. Use /play first.")
@@ -450,6 +496,18 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Check channel membership first
+    is_member = await check_channel_membership(update, context)
+    if not is_member:
+        await update.message.reply_text(
+            "⚠️ *Channel Subscription Required!*\n\n"
+            "You must join our channel to use this bot.\n\n"
+            f"📢 Join here: {CHANNEL_LINK}\n\n"
+            "After joining, try again.",
+            parse_mode="Markdown"
+        )
+        return
+    
     sess = context.user_data.get("session")
     if not sess:
         await update.message.reply_text("⚠️ Not logged in. Use /play first.")
